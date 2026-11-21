@@ -59,26 +59,3 @@ def pack():
     print(f"Minified: {min_engine_size} bytes")
     print(f"Compressed: {comp_engine_size} bytes")
     print(f"Encoded (base85): {enc_engine_size} bytes")
-    print("--- CLIENT STAGES ---")
-    print(f"Raw: {raw_client_size} bytes")
-    print(f"Minified: {min_client_size} bytes")
-    print(f"Compressed: {comp_client_size} bytes")
-    print(f"Encoded (base85): {enc_client_size} bytes")
-    stub = f"import lzma,base64 as b;[exec(lzma.decompress(b.b85decode(x)))for x in({repr(b85_engine)},{repr(b85_client)})]"
-    return stub
-def main_run():
-    for i in range(2):
-        print(f"\n=== Pack run {i+1} ===")
-        stub = pack()
-        size = len(stub.encode('utf-8'))
-        print(f"Final stub size: {size} bytes")
-        with open('main.py', 'w', encoding='utf-8') as f:
-            f.write(stub)
-    res = subprocess.run(['wc', '-c', 'main.py'], capture_output=True, text=True)
-    print("wc -c main.py:", res.stdout.strip())
-    print("Verifying AST parse of main.py...")
-    with open('main.py', 'r', encoding='utf-8') as f:
-        ast.parse(f.read())
-    print("AST parse SUCCESS.")
-if __name__ == '__main__':
-    main_run()
